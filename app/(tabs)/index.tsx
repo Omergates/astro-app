@@ -1,31 +1,18 @@
-import { StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import { supabase } from '../../lib/supabase';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function HomeScreen() {
+  useEffect(() => {
+    supabase.from('users').select('*').then(({ error }) => {
+      if (error) console.error('❌ Supabase erreur:', error.message);
+      else console.log('✅ Supabase connecté !');
+    });
+  }, []);
 
-export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Hello, astro 🌙</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
