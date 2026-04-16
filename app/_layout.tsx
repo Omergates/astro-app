@@ -1,59 +1,64 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useFonts } from "expo-font";
+import { Stack, router } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import "react-native-reanimated";
 
-import { useColorScheme } from '@/components/useColorScheme';
+// Import global CSS pour NativeWind
+import "../global.css";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from "expo-router";
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Empêche le splash screen de disparaître avant le chargement
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+  const [isReady, setIsReady] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
+  // Vérifie si l'utilisateur a complété l'onboarding
   useEffect(() => {
-    if (loaded) {
+    AsyncStorage.getItem("user_profile").then((data) => {
+      setNeedsOnboarding(!data);
+      setIsReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (loaded && isReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, isReady]);
 
-  if (!loaded) {
+  // Redirige vers l'onboarding si nécessaire, après le premier render
+  useEffect(() => {
+    if (loaded && isReady && needsOnboarding) {
+      router.replace("/onboarding");
+    }
+  }, [loaded, isReady, needsOnboarding]);
+
+  if (!loaded || !isReady) {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+    <>
+      <StatusBar style="light" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="onboarding" />
       </Stack>
-    </ThemeProvider>
+    </>
   );
 }

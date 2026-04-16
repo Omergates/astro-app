@@ -1,57 +1,57 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import React from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Tabs } from "expo-router";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
+/**
+ * Layout des 3 onglets AstroMoi.
+ * Style : fond sombre, icônes inactives grises, icône active dorée.
+ */
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#0D0D1A",
+          borderTopColor: "rgba(124, 58, 237, 0.15)",
+          borderTopWidth: 1,
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 60,
+        },
+        tabBarActiveTintColor: "#F59E0B",
+        tabBarInactiveTintColor: "#6B7280",
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          title: "Aujourd'hui",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="sun-o" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="theme"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Mon Thème",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="star" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="rapport"
+        options={{
+          title: "Mon Rapport",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="file-text-o" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
